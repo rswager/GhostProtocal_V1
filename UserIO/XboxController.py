@@ -36,7 +36,7 @@ class XboxController(object):
 
 
     def read(self): # return the buttons/triggers that you care about in this methode	
-        return [self.LeftJoystickY,self.LeftJoystickX,self.RightJoystickX,self.LeftBumper,self.RightBumper,self.Y,self.A,self.X,self.Start]
+        return [self.LeftJoystickY,self.LeftJoystickX,self.RightJoystickX,self.LeftBumper,self.RightBumper,self.Y,self.A,self.X,self.B,self.Start]
 
 
     def _monitor_controller(self):
