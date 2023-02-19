@@ -18,15 +18,17 @@ class KeyBoard(object):
 		self.BACKSPACE = 0
 		self.SPACE = 0
 		self.TAB = 0
+		self.process = True
 
 		self._monitor_thread = threading.Thread(target=self._monitor_keyboard, args=())
 		self._monitor_thread.daemon = True
 		self._monitor_thread.start()
 
+	def read(self): # return the buttons/triggers that you care about in this methode
+		return self.W,self.A,self.S,self.D,self.UP,self.DOWN,self.LEFT,self.RIGHT,self.ESCAPE,self.ENTER,self.BACKSPACE,self.SPACE,self.TAB
 
-	def read(self): # return the buttons/triggers that you care about in this methode	
-		return [self.W,self.A,self.S,self.D,self.UP,self.DOWN,self.LEFT,self.RIGHT,self.ESCAPE,self.ENTER,self.BACKSPACE,self.SPACE]
-		
+	def __del__(self):
+		self.process = False
 
 	def _monitor_keyboard(self):
 		pygame.init()
@@ -43,7 +45,7 @@ class KeyBoard(object):
 		  
 		# Fill the background colour to the screen
 		screen.fill(background_colour)
-		while True:
+		while self.process:
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
 						if event.key == pygame.K_w:
@@ -64,6 +66,7 @@ class KeyBoard(object):
 							self.RIGHT = 1
 						elif event.key == pygame.K_ESCAPE:
 							self.ESCAPE = 1
+							self.process = False
 						elif event.key == pygame.K_RETURN:
 							self.ENTER = 1
 						elif event.key == pygame.K_BACKSPACE:
@@ -72,9 +75,6 @@ class KeyBoard(object):
 							self.SPACE = 1
 						elif event.key == pygame.K_TAB:
 							self.TAB = 1
-							
-							
-
 				elif event.type == pygame.KEYUP:
 						if event.key == pygame.K_w:
 							self.W = 0
@@ -102,7 +102,7 @@ class KeyBoard(object):
 							self.SPACE = 0
 						elif event.key == pygame.K_TAB:
 							self.TAB = 0
-								
+		pygame.quit()
 
 if __name__ == '__main__':
 	key = KeyBoard()

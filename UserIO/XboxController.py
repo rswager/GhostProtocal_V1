@@ -29,18 +29,19 @@ class XboxController(object):
         self.RightDPad = 0
         self.UpDPad = 0
         self.DownDPad = 0
+        self.process = True
 
         self._monitor_thread = threading.Thread(target=self._monitor_controller, args=())
         self._monitor_thread.daemon = True
         self._monitor_thread.start()
 
-
     def read(self): # return the buttons/triggers that you care about in this methode	
-        return [self.LeftJoystickY,self.LeftJoystickX,self.RightJoystickX,self.LeftBumper,self.RightBumper,self.Y,self.A,self.X,self.B,self.Start]
+        return self.LeftJoystickY,self.LeftJoystickX,self.RightJoystickX,self.LeftBumper,self.RightBumper,self.Y,self.A,self.X,self.B,self.Start
 
 
     def _monitor_controller(self):
-        while True:
+        self.process = True
+        while process:
             events = get_gamepad()
             for event in events:
                 if event.code == 'ABS_Y':
@@ -67,6 +68,8 @@ class XboxController(object):
                     self.X = event.state #previously switched with Y
                 elif event.code == 'BTN_EAST':
                     self.B = event.state
+                    if self.B == 1:
+                        self.process = False
                 elif event.code == 'BTN_THUMBL':
                     self.LeftThumb = event.state
                 elif event.code == 'BTN_THUMBR':
@@ -75,6 +78,8 @@ class XboxController(object):
                     self.Back = event.state
                 elif event.code == 'BTN_START':
                     self.Start = event.state
+                    if self.Start == 1:
+                        self.process = False
                 elif event.code == 'BTN_TRIGGER_HAPPY1':
                     self.LeftDPad = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY2':
