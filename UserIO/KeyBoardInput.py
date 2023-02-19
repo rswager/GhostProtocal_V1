@@ -43,8 +43,6 @@ class KeyBoard(object):
 		# Fill the background colour to the screen
 		screen.fill(background_colour)
 		while process:
-			print("Keyboard running")
-			time.sleep(1)
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_w:
