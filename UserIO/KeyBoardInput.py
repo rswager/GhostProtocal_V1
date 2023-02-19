@@ -18,7 +18,6 @@ class KeyBoard(object):
 		self.BACKSPACE = 0
 		self.SPACE = 0
 		self.TAB = 0
-		self.process = True
 
 		self._monitor_thread = threading.Thread(target=self._monitor_keyboard, args=())
 		self._monitor_thread.daemon = True
@@ -27,10 +26,8 @@ class KeyBoard(object):
 	def read(self): # return the buttons/triggers that you care about in this methode
 		return self.W,self.A,self.S,self.D,self.UP,self.DOWN,self.LEFT,self.RIGHT,self.ESCAPE,self.ENTER,self.BACKSPACE,self.SPACE,self.TAB
 
-	def __del__(self):
-		self.process = False
-
 	def _monitor_keyboard(self):
+		process = True
 		pygame.init()
 		# Define the background colour
 		# using RGB color coding.
@@ -41,67 +38,72 @@ class KeyBoard(object):
 		screen = pygame.display.set_mode((300, 300))
 		  
 		# Set the caption of the screen
-		pygame.display.set_caption('Geeksforgeeks')
+		pygame.display.set_caption('CLICK ON ME TO TAKE INPUT')
 		  
 		# Fill the background colour to the screen
 		screen.fill(background_colour)
-		while self.process:
+		while process:
+			print("Keyboard running")
+			time.sleep(1)
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
-						if event.key == pygame.K_w:
-							self.W = 1
-						elif event.key == pygame.K_a:
-							self.A = 1
-						elif event.key == pygame.K_s:
-							self.S = 1
-						elif event.key == pygame.K_d:
-							self.D = 1
-						elif event.key == pygame.K_UP:
-							self.UP = 1
-						elif event.key == pygame.K_DOWN:
-							self.DOWN = 1
-						elif event.key == pygame.K_LEFT:
-							self.LEFT = 1
-						elif event.key == pygame.K_RIGHT:
-							self.RIGHT = 1
-						elif event.key == pygame.K_ESCAPE:
-							self.ESCAPE = 1
-							self.process = False
-						elif event.key == pygame.K_RETURN:
-							self.ENTER = 1
-						elif event.key == pygame.K_BACKSPACE:
-							self.BACKSPACE = 1
-						elif event.key == pygame.K_SPACE:
-							self.SPACE = 1
-						elif event.key == pygame.K_TAB:
-							self.TAB = 1
+					if event.key == pygame.K_w:
+						self.W = 1
+					elif event.key == pygame.K_a:
+						self.A = 1
+					elif event.key == pygame.K_s:
+						self.S = 1
+					elif event.key == pygame.K_d:
+						self.D = 1
+					elif event.key == pygame.K_UP:
+						self.UP = 1
+					elif event.key == pygame.K_DOWN:
+						self.DOWN = 1
+					elif event.key == pygame.K_LEFT:
+						self.LEFT = 1
+					elif event.key == pygame.K_RIGHT:
+						self.RIGHT = 1
+					elif event.key == pygame.K_ESCAPE:
+						self.ESCAPE = 1
+						process = False
+						break
+					elif event.key == pygame.K_RETURN:
+						self.ENTER = 1
+					elif event.key == pygame.K_BACKSPACE:
+						self.BACKSPACE = 1
+					elif event.key == pygame.K_SPACE:
+						self.SPACE = 1
+					elif event.key == pygame.K_TAB:
+						self.TAB = 1
+						process = False
+						break
 				elif event.type == pygame.KEYUP:
-						if event.key == pygame.K_w:
-							self.W = 0
-						elif event.key == pygame.K_a:
-							self.A = 0
-						elif event.key == pygame.K_s:
-							self.S = 0
-						elif event.key == pygame.K_d:
-							self.D = 0
-						elif event.key == pygame.K_UP:
-							self.UP = 0
-						elif event.key == pygame.K_DOWN:
-							self.DOWN = 0
-						elif event.key == pygame.K_LEFT:
-							self.LEFT = 0
-						elif event.key == pygame.K_RIGHT:
-							self.RIGHT = 0
-						elif event.key == pygame.K_ESCAPE:
-							self.ESCAPE = 0
-						elif event.key == pygame.K_RETURN:
-							self.ENTER = 0
-						elif event.key == pygame.K_BACKSPACE:
-							self.BACKSPACE = 0
-						elif event.key == pygame.K_SPACE:
-							self.SPACE = 0
-						elif event.key == pygame.K_TAB:
-							self.TAB = 0
+					if event.key == pygame.K_w:
+						self.W = 0
+					elif event.key == pygame.K_a:
+						self.A = 0
+					elif event.key == pygame.K_s:
+						self.S = 0
+					elif event.key == pygame.K_d:
+						self.D = 0
+					elif event.key == pygame.K_UP:
+						self.UP = 0
+					elif event.key == pygame.K_DOWN:
+						self.DOWN = 0
+					elif event.key == pygame.K_LEFT:
+						self.LEFT = 0
+					elif event.key == pygame.K_RIGHT:
+						self.RIGHT = 0
+					elif event.key == pygame.K_ESCAPE:
+						self.ESCAPE = 0
+					elif event.key == pygame.K_RETURN:
+						self.ENTER = 0
+					elif event.key == pygame.K_BACKSPACE:
+						self.BACKSPACE = 0
+					elif event.key == pygame.K_SPACE:
+						self.SPACE = 0
+					elif event.key == pygame.K_TAB:
+						self.TAB = 0
 		pygame.quit()
 
 if __name__ == '__main__':

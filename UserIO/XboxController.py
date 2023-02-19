@@ -29,7 +29,6 @@ class XboxController(object):
         self.RightDPad = 0
         self.UpDPad = 0
         self.DownDPad = 0
-        self.process = True
 
         self._monitor_thread = threading.Thread(target=self._monitor_controller, args=())
         self._monitor_thread.daemon = True
@@ -40,7 +39,7 @@ class XboxController(object):
 
 
     def _monitor_controller(self):
-        self.process = True
+        process = True
         while process:
             events = get_gamepad()
             for event in events:
@@ -69,7 +68,8 @@ class XboxController(object):
                 elif event.code == 'BTN_EAST':
                     self.B = event.state
                     if self.B == 1:
-                        self.process = False
+                        process = False
+                        break
                 elif event.code == 'BTN_THUMBL':
                     self.LeftThumb = event.state
                 elif event.code == 'BTN_THUMBR':
@@ -79,7 +79,8 @@ class XboxController(object):
                 elif event.code == 'BTN_START':
                     self.Start = event.state
                     if self.Start == 1:
-                        self.process = False
+                        process = False
+                        break
                 elif event.code == 'BTN_TRIGGER_HAPPY1':
                     self.LeftDPad = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY2':
