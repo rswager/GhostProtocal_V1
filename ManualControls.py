@@ -1,17 +1,19 @@
 from inputs import get_gamepad
 from UserIO.KeyBoardInput import *
-from  UserIO.XboxController import *
+from UserIO.XboxController import *
 from djitellopy import Tello
 import sys
-#Tello Wrapper https://djitellopy.readthedocs.io/en/latest/tello/
+# Tello Wrapper https://djitellopy.readthedocs.io/en/latest/tello/
+
 
 # Connect to the Drone( don't have it currently)
-def checkGamepad():
+def check_gamepad():
     try:
         get_gamepad()
         return True
     except:
         return False
+
 
 # MAIN PROGRAM STARTS HERE
 if __name__ == "__main__":
@@ -34,7 +36,7 @@ if __name__ == "__main__":
             print("Test Failed")
             sys.exit()
 
-        print("Conneciton SUCCESSFUL...Moving to Get User Input")
+        print("Connection SUCCESSFUL...Moving to Get User Input")
     else:
         loopSpeedSeconds = .5
         print("In Debug Mode")
@@ -52,7 +54,9 @@ if __name__ == "__main__":
         time.sleep(loopSpeedSeconds)
         if IoDevice == 'KeyBoard':
             # Get KeyBoard Response
-            Key_W,Key_A,Key_S,Key_D,Key_Up,Key_Down,Key_Left,Key_Right,Key_Escape,Key_Enter,Key_Backspace,Key_Space,Key_Tab = UserKeyboard.read()
+            Key_W, Key_A, Key_S, Key_D, Key_Up, Key_Down, Key_Left,\
+                Key_Right, Key_Escape, Key_Enter, Key_Backspace,\
+                Key_Space, Key_Tab = UserKeyboard.read()
 
             # Check for Program Termination
             if Key_Escape == 1:
@@ -68,16 +72,15 @@ if __name__ == "__main__":
                 if Landed:
                     # Check for Input Switch (to xbox controller)
                     if Key_Tab == 1:
-                        del UserKeyboard
                         # Check to see if there is a gamepad to connect to
-                        if checkGamepad():
+                        if check_gamepad():
                             # Move over to the Controller
+                            del UserKeyboard
                             userGamePad = XboxController()
                             print("Changed to Xbox Controller")
                             IoDevice = 'Controller'
                         else:
                             # No Gamepad Detected so we go back to Keyboard
-                            UserKeyboard = KeyBoard()
                             print("NO GAMEPAD-RETURNED TO KEYBOARD")
                             Key_Tab = 0
                     # Check for takeoff
@@ -139,14 +142,16 @@ if __name__ == "__main__":
                                 print(f'KEYBOAR INPUT {left_right},{forward_backward},{up_down},{yaw}')
                             else:
                                 # Send Movement
-                                quadDrone.send_rc_control(left_right,forward_backward,up_down,yaw)
+                                quadDrone.send_rc_control(left_right, forward_backward, up_down, yaw)
                         else:
                             if deBug:
                                 print(f'HOVER - {left_right},{forward_backward},{up_down},{yaw}')
                             else:
-                                quadDrone.send_rc_control(left_right,forward_backward,up_down,yaw)
+                                quadDrone.send_rc_control(left_right, forward_backward, up_down, yaw)
         elif IoDevice == 'Controller':
-            LeftJoystickY, LeftJoystickX, RightJoystickX, LeftBumper, RightBumper, Y_Button, A_Button, X_Button, B_Button, Start_Button = userGamePad.read()
+            LeftJoystickY, LeftJoystickX, RightJoystickX, \
+                LeftBumper, RightBumper, Y_Button, A_Button, \
+                X_Button, B_Button, Start_Button = userGamePad.read()
             # Check for Program Termination
             if X_Button == 1:
                 process = False
@@ -209,15 +214,15 @@ if __name__ == "__main__":
                             # Get Yaw
                             yaw = int(RightJoystickX * MAX_SPEED)
                             if deBug:
-                                print(f'KEYBOAR INPUT {left_right},{forward_backward},{up_down},{yaw}')
+                                print(f'KEYBOARD INPUT {left_right},{forward_backward},{up_down},{yaw}')
                             else:
                                 # Send Movement
-                                quadDrone.send_rc_control(left_right,forward_backward,up_down,yaw)
+                                quadDrone.send_rc_control(left_right, forward_backward, up_down, yaw)
                         else:
                             if deBug:
                                 print(f'HOVER - {left_right},{forward_backward},{up_down},{yaw}')
                             else:
-                                quadDrone.send_rc_control(left_right,forward_backward,up_down,yaw)
+                                quadDrone.send_rc_control(left_right, forward_backward, up_down, yaw)
     if not deBug:
         quadDrone.end()
     print("Program Closed")

@@ -1,30 +1,36 @@
 import pygame
 import time
-import threading
-#KEY LIST : https://www.pygame.org/docs/ref/key.html
+import multiprocessing as mp
+# KEY LIST : https://www.pygame.org/docs/ref/key.html
+
 
 class KeyBoard(object):
 	def __init__(self):
-		self.W = 0
-		self.A = 0
-		self.S = 0
-		self.D = 0
-		self.UP = 0
-		self.DOWN = 0
-		self.LEFT = 0
-		self.RIGHT = 0
-		self.ESCAPE = 0
-		self.ENTER = 0
-		self.BACKSPACE = 0
-		self.SPACE = 0
-		self.TAB = 0
+		self.W = mp.Value('i', 0)
+		self.A = mp.Value('i', 0)
+		self.S = mp.Value('i', 0)
+		self.D = mp.Value('i', 0)
+		self.UP = mp.Value('i', 0)
+		self.DOWN = mp.Value('i', 0)
+		self.LEFT = mp.Value('i', 0)
+		self.RIGHT = mp.Value('i', 0)
+		self.ESCAPE = mp.Value('i', 0)
+		self.ENTER = mp.Value('i', 0)
+		self.BACKSPACE = mp.Value('i', 0)
+		self.SPACE = mp.Value('i', 0)
+		self.TAB = mp.Value('i', 0)
 
-		self._monitor_thread = threading.Thread(target=self._monitor_keyboard, args=())
-		self._monitor_thread.daemon = True
-		self._monitor_thread.start()
+		self._monitor_process = mp.Process(target=self._monitor_keyboard, args=())
+		self._monitor_process.start()
 
-	def read(self): # return the buttons/triggers that you care about in this methode
-		return self.W,self.A,self.S,self.D,self.UP,self.DOWN,self.LEFT,self.RIGHT,self.ESCAPE,self.ENTER,self.BACKSPACE,self.SPACE,self.TAB
+	def __del__(self):
+		self._monitor_process.terminate()
+
+	# return the buttons/triggers that you care about in this methode
+	def read(self):
+		return self.W.value, self.A.value, self.S.value, self.D.value, \
+			self.UP.value, self.DOWN.value, self.LEFT.value, self.RIGHT.value,\
+			self.ESCAPE.value, self.ENTER.value, self.BACKSPACE.value, self.SPACE.value, self.TAB.value
 
 	def _monitor_keyboard(self):
 		process = True
@@ -32,80 +38,78 @@ class KeyBoard(object):
 		# Define the background colour
 		# using RGB color coding.
 		background_colour = (234, 212, 252)
-		  
+
 		# Define the dimensions of
 		# screen object(width,height)
 		screen = pygame.display.set_mode((300, 300))
-		  
+
 		# Set the caption of the screen
 		pygame.display.set_caption('CLICK ON ME TO TAKE INPUT')
-		  
+
 		# Fill the background colour to the screen
 		screen.fill(background_colour)
 		while process:
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_w:
-						self.W = 1
+						self.W.value = 1
 					elif event.key == pygame.K_a:
-						self.A = 1
+						self.A.value = 1
 					elif event.key == pygame.K_s:
-						self.S = 1
+						self.S.value = 1
 					elif event.key == pygame.K_d:
-						self.D = 1
+						self.D.value = 1
 					elif event.key == pygame.K_UP:
-						self.UP = 1
+						self.UP.value = 1
 					elif event.key == pygame.K_DOWN:
-						self.DOWN = 1
+						self.DOWN.value = 1
 					elif event.key == pygame.K_LEFT:
-						self.LEFT = 1
+						self.LEFT.value = 1
 					elif event.key == pygame.K_RIGHT:
-						self.RIGHT = 1
+						self.RIGHT.value = 1
 					elif event.key == pygame.K_ESCAPE:
-						self.ESCAPE = 1
-						process = False
-						break
+						self.ESCAPE.value = 1
 					elif event.key == pygame.K_RETURN:
-						self.ENTER = 1
+						self.ENTER.value = 1
 					elif event.key == pygame.K_BACKSPACE:
-						self.BACKSPACE = 1
+						self.BACKSPACE.value = 1
 					elif event.key == pygame.K_SPACE:
-						self.SPACE = 1
+						self.SPACE.value = 1
 					elif event.key == pygame.K_TAB:
-						self.TAB = 1
-						process = False
-						break
+						self.TAB.value = 1
 				elif event.type == pygame.KEYUP:
 					if event.key == pygame.K_w:
-						self.W = 0
+						self.W.value = 0
 					elif event.key == pygame.K_a:
-						self.A = 0
+						self.A.value = 0
 					elif event.key == pygame.K_s:
-						self.S = 0
+						self.S.value = 0
 					elif event.key == pygame.K_d:
-						self.D = 0
+						self.D.value = 0
 					elif event.key == pygame.K_UP:
-						self.UP = 0
+						self.UP.value = 0
 					elif event.key == pygame.K_DOWN:
-						self.DOWN = 0
+						self.DOWN.value = 0
 					elif event.key == pygame.K_LEFT:
-						self.LEFT = 0
+						self.LEFT.value = 0
 					elif event.key == pygame.K_RIGHT:
-						self.RIGHT = 0
+						self.RIGHT.value = 0
 					elif event.key == pygame.K_ESCAPE:
-						self.ESCAPE = 0
+						self.ESCAPE.value = 0
 					elif event.key == pygame.K_RETURN:
-						self.ENTER = 0
+						self.ENTER.value = 0
 					elif event.key == pygame.K_BACKSPACE:
-						self.BACKSPACE = 0
+						self.BACKSPACE.value = 0
 					elif event.key == pygame.K_SPACE:
-						self.SPACE = 0
+						self.SPACE.value = 0
 					elif event.key == pygame.K_TAB:
-						self.TAB = 0
+						self.TAB.value = 0
 		pygame.quit()
+
 
 if __name__ == '__main__':
 	key = KeyBoard()
 	while True:
 		print(key.read())
 		time.sleep(1)
+		

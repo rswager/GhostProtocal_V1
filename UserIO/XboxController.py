@@ -1,7 +1,8 @@
 from inputs import get_gamepad
 import time
 import math
-import threading
+import multiprocessing as mp
+
 
 class XboxController(object):
     MAX_TRIG_VAL = math.pow(2, 8)
@@ -9,34 +10,38 @@ class XboxController(object):
 
     def __init__(self):
 
-        self.LeftJoystickY = 0
-        self.LeftJoystickX = 0
-        self.RightJoystickY = 0
-        self.RightJoystickX = 0
-        self.LeftTrigger = 0
-        self.RightTrigger = 0
-        self.LeftBumper = 0
-        self.RightBumper = 0
-        self.A = 0
-        self.X = 0
-        self.Y = 0
-        self.B = 0
-        self.LeftThumb = 0
-        self.RightThumb = 0
-        self.Back = 0
-        self.Start = 0
-        self.LeftDPad = 0
-        self.RightDPad = 0
-        self.UpDPad = 0
-        self.DownDPad = 0
+        self.LeftJoystickY = mp.Value('d', 0)
+        self.LeftJoystickX = mp.Value('d', 0)
+        self.RightJoystickY = mp.Value('d', 0)
+        self.RightJoystickX = mp.Value('d', 0)
+        self.LeftTrigger = mp.Value('d', 0)
+        self.RightTrigger = mp.Value('d', 0)
+        self.LeftBumper = mp.Value('i', 0)
+        self.RightBumper = mp.Value('i', 0)
+        self.A = mp.Value('i', 0)
+        self.X = mp.Value('i', 0)
+        self.Y = mp.Value('i', 0)
+        self.B = mp.Value('i', 0)
+        self.LeftThumb = mp.Value('i', 0)
+        self.RightThumb = mp.Value('i', 0)
+        self.Back = mp.Value('i', 0)
+        self.Start = mp.Value('i', 0)
+        self.LeftDPad = mp.Value('i', 0)
+        self.RightDPad = mp.Value('i', 0)
+        self.UpDPad = mp.Value('i', 0)
+        self.DownDPad = mp.Value('i', 0)
 
-        self._monitor_thread = threading.Thread(target=self._monitor_controller, args=())
-        self._monitor_thread.daemon = True
-        self._monitor_thread.start()
+        self._monitor_process = mp.Process(target=self._monitor_controller, args=())
+        self._monitor_process.start()
 
-    def read(self): # return the buttons/triggers that you care about in this methode	
-        return self.LeftJoystickY,self.LeftJoystickX,self.RightJoystickX,self.LeftBumper,self.RightBumper,self.Y,self.A,self.X,self.B,self.Start
+    def __del__(self):
+        self._monitor_process.terminate()
 
+    # return the buttons/triggers that you care about in this methode
+    def read(self):
+        return self.LeftJoystickY.value, self.LeftJoystickX.value, self.RightJoystickX.value,\
+            self.LeftBumper.value, self.RightBumper.value, self.Y.value, self.A.value, self.X.value,\
+            self.B.value, self.Start.value
 
     def _monitor_controller(self):
         process = True
@@ -44,53 +49,53 @@ class XboxController(object):
             events = get_gamepad()
             for event in events:
                 if event.code == 'ABS_Y':
-                    self.LeftJoystickY = round(event.state / XboxController.MAX_JOY_VAL,2) # normalize between -1 and 1
+                    # normalize between -1 and 1
+                    self.LeftJoystickY.value = round(event.state / XboxController.MAX_JOY_VAL, 2)
                 elif event.code == 'ABS_X':
-                    self.LeftJoystickX = round(event.state / XboxController.MAX_JOY_VAL,2) # normalize between -1 and 1
+                    # normalize between -1 and 1
+                    self.LeftJoystickX.value = round(event.state / XboxController.MAX_JOY_VAL, 2)
                 elif event.code == 'ABS_RY':
-                    self.RightJoystickY = round(event.state / XboxController.MAX_JOY_VAL,2) # normalize between -1 and 1
+                    # normalize between -1 and 1
+                    self.RightJoystickY.value = round(event.state / XboxController.MAX_JOY_VAL, 2)
                 elif event.code == 'ABS_RX':
-                    self.RightJoystickX = round(event.state / XboxController.MAX_JOY_VAL,2) # normalize between -1 and 1
+                    # normalize between -1 and 1
+                    self.RightJoystickX.value = round(event.state / XboxController.MAX_JOY_VAL, 2)
                 elif event.code == 'ABS_Z':
-                    self.LeftTrigger = round(event.state / XboxController.MAX_TRIG_VAL,2) # normalize between 0 and 1
+                    # normalize between 0 and 1
+                    self.LeftTrigger.value = round(event.state / XboxController.MAX_TRIG_VAL, 2)
                 elif event.code == 'ABS_RZ':
-                    self.RightTrigger = round(event.state / XboxController.MAX_TRIG_VAL,2) # normalize between 0 and 1
+                    # normalize between 0 and 1
+                    self.RightTrigger.value = round(event.state / XboxController.MAX_TRIG_VAL, 2)
                 elif event.code == 'BTN_TL':
-                    self.LeftBumper = event.state
+                    self.LeftBumper.value = event.state
                 elif event.code == 'BTN_TR':
-                    self.RightBumper = event.state
+                    self.RightBumper.value = event.state
                 elif event.code == 'BTN_SOUTH':
-                    self.A = event.state
+                    self.A.value = event.state
                 elif event.code == 'BTN_NORTH':
-                    self.Y = event.state #previously switched with X
+                    # previously switched with X
+                    self.Y.value = event.state
                 elif event.code == 'BTN_WEST':
-                    self.X = event.state #previously switched with Y
+                    # previously switched with Y
+                    self.X.value = event.state
                 elif event.code == 'BTN_EAST':
-                    self.B = event.state
-                    if self.B == 1:
-                        process = False
-                        break
+                    self.B.value = event.state
                 elif event.code == 'BTN_THUMBL':
-                    self.LeftThumb = event.state
+                    self.LeftThumb.value = event.state
                 elif event.code == 'BTN_THUMBR':
-                    self.RightThumb = event.state
+                    self.RightThumb.value = event.state
                 elif event.code == 'BTN_SELECT':
-                    self.Back = event.state
+                    self.Back.value = event.state
                 elif event.code == 'BTN_START':
-                    self.Start = event.state
-                    if self.Start == 1:
-                        process = False
-                        break
+                    self.Start.value = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY1':
-                    self.LeftDPad = event.state
+                    self.LeftDPad.value = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY2':
-                    self.RightDPad = event.state
+                    self.RightDPad.value = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY3':
-                    self.UpDPad = event.state
+                    self.UpDPad.value = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY4':
-                    self.DownDPad = event.state
-
-
+                    self.DownDPad.value = event.state
 
 
 if __name__ == '__main__':
