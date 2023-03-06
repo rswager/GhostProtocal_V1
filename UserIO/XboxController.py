@@ -30,6 +30,7 @@ class XboxController(object):
         self.RightDPad = mp.Value('i', 0)
         self.UpDPad = mp.Value('i', 0)
         self.DownDPad = mp.Value('i', 0)
+        self.Select = mp.Value('i', 0)
 
         self._monitor_process = mp.Process(target=self._monitor_controller, args=())
         self._monitor_process.start()
@@ -41,7 +42,7 @@ class XboxController(object):
     def read(self):
         return self.LeftJoystickY.value, self.LeftJoystickX.value, self.RightJoystickX.value,\
             self.LeftBumper.value, self.RightBumper.value, self.Y.value, self.A.value, self.X.value,\
-            self.B.value, self.Start.value
+            self.B.value, self.Start.value, self.Select.value
 
     def _monitor_controller(self):
         process = True

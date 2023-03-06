@@ -19,6 +19,7 @@ class KeyBoard(object):
 		self.BACKSPACE = mp.Value('i', 0)
 		self.SPACE = mp.Value('i', 0)
 		self.TAB = mp.Value('i', 0)
+		self.C = mp.Value('i', 0)
 
 		self._monitor_process = mp.Process(target=self._monitor_keyboard, args=())
 		self._monitor_process.start()
@@ -30,7 +31,7 @@ class KeyBoard(object):
 	def read(self):
 		return self.W.value, self.A.value, self.S.value, self.D.value, \
 			self.UP.value, self.DOWN.value, self.LEFT.value, self.RIGHT.value,\
-			self.ESCAPE.value, self.ENTER.value, self.BACKSPACE.value, self.SPACE.value, self.TAB.value
+			self.ESCAPE.value, self.ENTER.value, self.BACKSPACE.value, self.SPACE.value, self.TAB.value, self.C.value
 
 	def _monitor_keyboard(self):
 		process = True
@@ -77,6 +78,8 @@ class KeyBoard(object):
 						self.SPACE.value = 1
 					elif event.key == pygame.K_TAB:
 						self.TAB.value = 1
+					elif event.key == pygame.K_c:
+						self.C.value = 1
 				elif event.type == pygame.KEYUP:
 					if event.key == pygame.K_w:
 						self.W.value = 0
@@ -104,6 +107,8 @@ class KeyBoard(object):
 						self.SPACE.value = 0
 					elif event.key == pygame.K_TAB:
 						self.TAB.value = 0
+					elif event.key == pygame.K_c:
+						self.C.value = 0
 		pygame.quit()
 
 
@@ -112,4 +117,3 @@ if __name__ == '__main__':
 	while True:
 		print(key.read())
 		time.sleep(1)
-		

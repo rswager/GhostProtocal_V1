@@ -1,8 +1,10 @@
 from inputs import get_gamepad
 from UserIO.KeyBoardInput import *
 from UserIO.XboxController import *
+from VideoCamera.DroneCamera import *
 from djitellopy import Tello
-import sys
+import sys,cv2
+import multiprocessing as mp
 # Tello Wrapper https://djitellopy.readthedocs.io/en/latest/tello/
 
 
@@ -20,7 +22,7 @@ if __name__ == "__main__":
     deBug = False
 
     if not deBug:
-        loopSpeedSeconds = .05
+        loopSpeedSeconds = 1
         quadDrone = Tello()
         try:
             print("Attempting to connect to drone!")
@@ -43,29 +45,48 @@ if __name__ == "__main__":
 
     process = True
     Hovering = False
+    Streaming = False
     Landed = True
     IoDevice = 'KeyBoard'
     UserKeyboard = KeyBoard()
     userGamePad = None
+    SteamProcess = None     # For Controlling the Stream
     MAX_SPEED = 100      # For the Controller
     DEFAULT_SPEED = 50  # For the Keyboard
 
     while process:
-        time.sleep(loopSpeedSeconds)
+        if Streaming:
+            img = quadDrone.get_frame_read().frame
+            img = cv2.resize(img, (360, 240))
+            cv2.imshow("Image", img)
+            cv2.waitKey(loopSpeedSeconds)
+
         if IoDevice == 'KeyBoard':
             # Get KeyBoard Response
             Key_W, Key_A, Key_S, Key_D, Key_Up, Key_Down, Key_Left,\
                 Key_Right, Key_Escape, Key_Enter, Key_Backspace,\
-                Key_Space, Key_Tab = UserKeyboard.read()
+                Key_Space, Key_Tab, Key_C = UserKeyboard.read()
 
             # Check for Program Termination
             if Key_Escape == 1:
                 process = False
+                if Streaming:
+                    quadDrone.streamoff()
                 if not Landed:
                     if not deBug:
                         quadDrone.land()
                     print("Landing Drone")
                 del UserKeyboard
+            if Key_C == 1:
+                if Streaming:
+                    # Stop Streaming
+                    Streaming = False
+                    quadDrone.streamoff()
+                    cv2.destroyAllWindows()
+                else:
+                    # Start Steaming
+                    Streaming = True
+                    quadDrone.streamon()
             # If we are not Terminating then we are good to continue
             else:
                 # If we are landed then we only want to take off or check for input change
@@ -151,15 +172,28 @@ if __name__ == "__main__":
         elif IoDevice == 'Controller':
             LeftJoystickY, LeftJoystickX, RightJoystickX, \
                 LeftBumper, RightBumper, Y_Button, A_Button, \
-                X_Button, B_Button, Start_Button = userGamePad.read()
+                X_Button, B_Button, Start_Button, Select_Button = userGamePad.read()
             # Check for Program Termination
             if X_Button == 1:
                 process = False
+                if Streaming:
+                    quadDrone.streamoff()
                 if not Landed:
                     if not deBug:
                         quadDrone.land()
                     print("Landing Drone")
                 del userGamePad
+            if Select_Button == 1:
+                if Streaming:
+                    # Stop Streaming
+                    Streaming = False
+                    SteamProcess.terminate()
+                else:
+                    # Start Steaming
+                    Streaming = True
+                    SteamProcess = mp.Process(target=stream_tello, args=(quadDrone))
+                    SteamProcess.start()
+
             # If we are not Terminating then we are good to continue
             else:
                 # If we are landed then we only want to take off or check for input change
